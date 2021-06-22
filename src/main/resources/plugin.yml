@@ -1,0 +1,23 @@
+name: Mesa
+version: @version@
+main: com.crimsonvalkyrie.mesa.Mesa
+api-version: 1.17
+depend: [ LuckPerms, DiscordSRV, TAB ]
+authors: [ null_Zer0 ]
+description: A plugin made for the Mesa minecraft server
+permissions:
+  mesa.admin:
+    default: op
+    children:
+      mesa.commandspy: true
+      mesa.reload: true
+      mesa.tag: true
+  mesa.commandspy:
+    description: Gives access to the /commandspy command
+    default: op
+  mesa.reload:
+    description: Gives access to /mesa reload
+    default: op
+  mesa.tag:
+    description: Gives access to /prefix, /suffix, and /title
+    default: true

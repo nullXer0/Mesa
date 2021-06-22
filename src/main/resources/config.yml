@@ -1,0 +1,21 @@
+# DO NOT TOUCH VERSION
+version: 1
+discord:
+  token: ""
+  channel: ""
+tags:
+  titles:
+    ababa: "[ababa]"
+  prefixes:
+    ababa: "[ababa]"
+    ububu: "[ububu]"
+  suffixes:
+    ububu: "[ububu]"
+    ebebe:
+      default: "[ebebe]"
+      variants:
+        '1': "[&1ebebe&r]"
+        '2': "[&2ebebe&r]"
+        '3': "[&3ebebe&r]"
+commandspy-blacklist:
+  - "list"

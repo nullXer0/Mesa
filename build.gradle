@@ -1,0 +1,53 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java'
+}
+
+group = 'com.crimsonvalkyrie'
+version = '2.0.0-SNAPSHOT'
+
+sourceCompatibility = '16'
+targetCompatibility = '16'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        url = 'https://papermc.io/repo/repository/maven-public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.aikar.co/content/groups/aikar/' }
+    maven { url 'https://nexus.scarsz.me/content/groups/public/' }
+    maven { url 'https://m2.dv8tion.net/releases' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT'
+    compileOnly 'net.luckperms:api:5.3'
+    compileOnly 'com.github.NEZNAMY:TAB:2.9.0'
+    compileOnly 'com.discordsrv:discordsrv:1.23.0'
+
+    implementation 'co.aikar:acf-paper:0.5.0-SNAPSHOT'
+}
+
+shadowJar {
+    relocate 'co.aikar.commands', 'com.crimsonvalkyrie.mesa.acf'
+    relocate 'co.aikar.locales', 'com.crimsonvalkyrie.mesa.locales'
+}
+build.dependsOn shadowJar
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
+
+rootProject.tasks.named("processResources") {
+    duplicatesStrategy = 'include'
+}
