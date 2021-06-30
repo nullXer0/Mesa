@@ -11,6 +11,7 @@ import java.util.List;
 
 @CommandAlias("commandspy|cspy")
 @CommandPermission("commandspy.admin")
+@SuppressWarnings("unused")
 public class SpyCommand extends BaseCommand
 {
 	@Default

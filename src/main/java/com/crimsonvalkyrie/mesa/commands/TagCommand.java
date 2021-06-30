@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 @CommandAlias("title|prefix|suffix")
 @CommandPermission("mesa.tag")
+@SuppressWarnings("unused")
 public class TagCommand extends BaseCommand
 {
 	final TextComponent titleButtons = createChangeClearButtons("/title list", "/title clear");

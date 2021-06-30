@@ -253,11 +253,6 @@ public class TagUtils
 		return variantMap.get(type);
 	}
 
-	public static boolean isVarianted(TagType type, String tag)
-	{
-		return variantMap.get(type).contains(tag);
-	}
-
 	public enum TagType
 	{
 		TITLE,

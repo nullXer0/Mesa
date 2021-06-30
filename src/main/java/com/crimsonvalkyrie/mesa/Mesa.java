@@ -74,9 +74,4 @@ public final class Mesa extends JavaPlugin
 	{
 		return luckPerms;
 	}
-
-	public static PaperCommandManager getCommandManager()
-	{
-		return commandManager;
-	}
 }

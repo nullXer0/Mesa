@@ -9,6 +9,7 @@ import com.crimsonvalkyrie.mesa.Mesa;
 import org.bukkit.ChatColor;
 
 @CommandAlias("mesa")
+@SuppressWarnings("unused")
 public class MesaCommand extends BaseCommand
 {
 	@Subcommand("reload")
