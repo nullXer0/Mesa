@@ -7,16 +7,16 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class BookUtils
 {
 	public static Book generateTagMenu(Player player, TagUtils.TagType type)
 	{
-		HashMap<String, String> tagMap = TagUtils.getTagMap(type);
-		HashSet<String> variantedSet = TagUtils.getVariantSet(type);
+		LinkedHashMap<String, String> tagMap = TagUtils.getTagMap(type);
+		LinkedHashSet<String> variantedSet = TagUtils.getVariantSet(type);
 		List<String> tagList = TagUtils.getPermissibleTagCodesOfType(player, type);
 		Book.Builder bookBuilder = Book.builder();
 		TextComponent.Builder pageBuilder = Component.text();
@@ -58,7 +58,7 @@ public class BookUtils
 
 	public static Book generateVariantsMenu(Player player, TagUtils.TagType type, String mainTagCode)
 	{
-		HashMap<String, String> tagMap = TagUtils.getTagMap(type);
+		LinkedHashMap<String, String> tagMap = TagUtils.getTagMap(type);
 		List<String> tagList = TagUtils.getPermissibleTagCodesOfType(player, type);
 		Book.Builder bookBuilder = Book.builder();
 		TextComponent.Builder pageBuilder = Component.text();

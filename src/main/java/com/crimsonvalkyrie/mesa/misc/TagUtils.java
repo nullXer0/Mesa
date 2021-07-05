@@ -21,8 +21,8 @@ public class TagUtils
 	private static final String PERMISSION_PREFIX = "mesa.tag.";
 	private static final String ADMIN_PERMISSION = "mesa.admin";
 
-	private static HashMap<TagType, HashMap<String, String>> tagMap;
-	private static HashMap<TagType, HashSet<String>> variantMap;
+	private static HashMap<TagType, LinkedHashMap<String, String>> tagMap;
+	private static HashMap<TagType, LinkedHashSet<String>> variantMap;
 
 	private static final String TAGS = "tags";
 	private static final String TITLES = "titles";
@@ -35,7 +35,7 @@ public class TagUtils
 
 	public static List<String> getPermissibleTagCodesOfType(Player player, TagType type)
 	{
-		HashMap<String, String> map = tagMap.get(type);
+		LinkedHashMap<String, String> map = tagMap.get(type);
 
 		if(player.hasPermission(ADMIN_PERMISSION))
 		{
@@ -172,8 +172,8 @@ public class TagUtils
 
 	public static void loadTagsFromConfig()
 	{
-		tagMap = new HashMap<>();
-		variantMap = new HashMap<>();
+		tagMap = new LinkedHashMap<>();
+		variantMap = new LinkedHashMap<>();
 
 		ConfigurationSection tagsSection = Mesa.getPlugin().getConfig().getConfigurationSection(TAGS);
 
@@ -211,8 +211,8 @@ public class TagUtils
 
 	private static void loadTagsOfType(TagType type, ConfigurationSection configSection)
 	{
-		HashMap<String, String> map = new HashMap<>();
-		HashSet<String> variantSet = new HashSet<>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		LinkedHashSet<String> variantSet = new LinkedHashSet<>();
 
 		Set<String> keys = configSection.getKeys(true);
 		keys.forEach(key ->
@@ -243,12 +243,12 @@ public class TagUtils
 		variantMap.put(type, variantSet);
 	}
 
-	public static HashMap<String, String> getTagMap(TagType type)
+	public static LinkedHashMap<String, String> getTagMap(TagType type)
 	{
 		return tagMap.get(type);
 	}
 
-	public static HashSet<String> getVariantSet(TagType type)
+	public static LinkedHashSet<String> getVariantSet(TagType type)
 	{
 		return variantMap.get(type);
 	}
