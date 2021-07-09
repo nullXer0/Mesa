@@ -2,7 +2,7 @@ package com.crimsonvalkyrie.mesa.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import com.crimsonvalkyrie.mesa.misc.BookUtils;
+import com.crimsonvalkyrie.mesa.misc.ChatUIUtils;
 import com.crimsonvalkyrie.mesa.misc.TagUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -44,18 +44,18 @@ public class TagCommand extends BaseCommand
 	}
 
 	@Subcommand("list")
-	public void onMenu(Player player)
+	public void onList(Player player, @Default("1") int page)
 	{
 		TagUtils.TagType type = TagUtils.TagType.valueOf(getExecCommandLabel().toUpperCase());
-		player.openBook(BookUtils.generateTagMenu(player, type));
+		player.sendMessage(ChatUIUtils.generateTagPage(player, type, page, null));
 	}
 
 	@Private
 	@Subcommand("variants")
-	public void onVariants(Player player, String tagCode)
+	public void onVariants(Player player, String tagCode, @Default("1") int page)
 	{
 		TagUtils.TagType type = TagUtils.TagType.valueOf(getExecCommandLabel().toUpperCase());
-		player.openBook(BookUtils.generateVariantsMenu(player, type, tagCode));
+		player.sendMessage(ChatUIUtils.generateTagPage(player, type, page, tagCode));
 	}
 
 	@Private
