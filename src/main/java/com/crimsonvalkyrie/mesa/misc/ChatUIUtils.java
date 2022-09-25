@@ -1,6 +1,6 @@
 package com.crimsonvalkyrie.mesa.misc;
 
-import com.crimsonvalkyrie.mesa.Mesa;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -37,7 +37,7 @@ public class ChatUIUtils
 		}
 		else
 		{
-			pageBuilder.append(serializer.deserialize("Current " + type.toString().toLowerCase() + ": " + currentTag), Component.newline());
+			pageBuilder.append(serializer.deserialize("Current " + type.toString().toLowerCase() + ": " + PlaceholderAPI.setPlaceholders(player, currentTag)), Component.newline());
 		}
 
 		int offset = Math.max(18 * (page - 1), 0);
@@ -45,15 +45,15 @@ public class ChatUIUtils
 		{
 			String s = tagList.get(i);
 
-			TextComponent.Builder entryBuilder = serializer.deserialize(tagMap.get(s)).toBuilder();
+			TextComponent.Builder entryBuilder = serializer.deserialize(PlaceholderAPI.setPlaceholders(player, tagMap.get(s))).toBuilder();
 
 			if(TagUtils.getVariantMap(type).containsKey(s))
 			{
-				entryBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type + " variants " + s));
+				entryBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type.toString().toLowerCase() + " variants " + s));
 			}
 			else
 			{
-				entryBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type + " set " + s));
+				entryBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type.toString().toLowerCase() + " set " + s));
 			}
 
 			pageBuilder.append(entryBuilder.build(), Component.newline());
@@ -67,14 +67,14 @@ public class ChatUIUtils
 
 		if(page > 1)
 		{
-			pageBuilder.append(Component.text("\u25C0").clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type + " list " + (page - 1))), Component.space());
+			pageBuilder.append(Component.text("\u25C0").clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type.toString().toLowerCase() + " list " + (page - 1))), Component.space());
 		}
 
 		pageBuilder.append(Component.text(page + "/" + totalPages));
 
 		if(page < totalPages)
 		{
-			pageBuilder.append(Component.space(), Component.text("\u25B6").clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type + " list " + (page + 1))));
+			pageBuilder.append(Component.space(), Component.text("\u25B6").clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type.toString().toLowerCase() + " list " + (page + 1))));
 		}
 
 		return pageBuilder.build();

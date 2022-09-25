@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.crimsonvalkyrie.mesa.misc.ChatUIUtils;
 import com.crimsonvalkyrie.mesa.misc.TagUtils;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -32,7 +33,7 @@ public class TagCommand extends BaseCommand
 		}
 		else
 		{
-			player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize("Current " + getExecCommandLabel() + ": " + currentTag));
+			player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize("Current " + getExecCommandLabel().toLowerCase() + ": " + PlaceholderAPI.setPlaceholders(player, currentTag)));
 		}
 
 		switch(type)
@@ -81,7 +82,7 @@ public class TagCommand extends BaseCommand
 
 		TagUtils.clearTag(player, type);
 
-		player.sendMessage("Your " + getExecCommandLabel() + " has been cleared");
+		player.sendMessage("Your " + getExecCommandLabel().toLowerCase() + " has been cleared");
 	}
 
 	private TextComponent createChangeClearButtons(String changeCommand, String clearCommand)
