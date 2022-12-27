@@ -43,7 +43,7 @@ dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'me.neznamy:tab-api:3.2.1'
-    compileOnly 'com.discordsrv:discordsrv:1.26.0-SNAPSHOT'
+    compileOnly 'com.discordsrv:discordsrv:1.26.0'
     compileOnly 'me.clip:placeholderapi:2.11.1'
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
 
