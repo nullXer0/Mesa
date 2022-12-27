@@ -103,6 +103,7 @@ public class CommandListener implements Listener
 				.append("X: ").append(location.getBlockX())
 				.append(", Y: ").append(location.getBlockY())
 				.append(", Z: ").append(location.getBlockZ())
+				.append(", In World: ").append(location.getWorld().getName())
 				.append("\n`").append(command).append("`").build();
 	}
 
