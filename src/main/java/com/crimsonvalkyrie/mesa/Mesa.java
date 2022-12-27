@@ -30,15 +30,6 @@ public final class Mesa extends JavaPlugin
 	public void onEnable()
 	{
 		saveDefaultConfig();
-		/*File configFile = new File(getDataFolder(), "config.yml");
-		try
-		{
-			ConfigUpdater.update(this, "config.yml", configFile, List.of());
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}*/
 		reloadConfig();
 
 		plugin = this;
@@ -70,15 +61,6 @@ public final class Mesa extends JavaPlugin
 	public static void reload()
 	{
 		plugin.saveDefaultConfig();
-		/*File configFile = new File(plugin.getDataFolder(), "config.yml");
-		try
-		{
-			ConfigUpdater.update(plugin, "config.yml", configFile, List.of());
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}*/
 		plugin.reloadConfig();
 
 		TagUtils.loadTagsFromConfig();
