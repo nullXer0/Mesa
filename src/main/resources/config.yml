@@ -1,5 +1,3 @@
-# DO NOT TOUCH VERSION
-version: 1
 discord:
   token: ""
   channel: ""
@@ -19,3 +17,7 @@ tags:
         '3': "[&3ebebe&r]"
 commandspy-blacklist:
   - "list"
+player-tracker:
+  price: 1000
+  # 0 = default eye behavior, 1 = always drop, 2 = never drop
+  drop-type: 0

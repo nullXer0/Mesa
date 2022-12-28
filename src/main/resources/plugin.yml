@@ -1,8 +1,8 @@
 name: Mesa
 version: @version@
 main: com.crimsonvalkyrie.mesa.Mesa
-api-version: 1.17
-depend: [ LuckPerms, DiscordSRV, TAB ]
+api-version: 1.19
+depend: [ LuckPerms, DiscordSRV, TAB, Vault ]
 authors: [ null_Zer0 ]
 description: A plugin made for the Mesa minecraft server
 permissions:
@@ -21,3 +21,6 @@ permissions:
   mesa.tag:
     description: Gives access to /prefix, /suffix, and /title
     default: true
+  mesa.buytracker:
+    description: Gives access to /buytracker
+    default: op

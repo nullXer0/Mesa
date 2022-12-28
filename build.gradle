@@ -3,13 +3,22 @@ import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'java'
+    id 'idea'
 }
 
-group = 'com.crimsonvalkyrie'
-version = '2.0.1'
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
 
-sourceCompatibility = '16'
-targetCompatibility = '16'
+idea {
+    module {
+        downloadJavadoc = true
+    }
+}
+
+
+group = 'com.crimsonvalkyrie'
+version = '3.1.0'
 
 repositories {
     mavenCentral()
@@ -21,19 +30,29 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.aikar.co/content/groups/aikar/' }
     maven { url 'https://nexus.scarsz.me/content/groups/public/' }
     maven { url 'https://m2.dv8tion.net/releases' }
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url 'https://repo.kryptonmc.org/releases' }
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT'
-    compileOnly 'net.luckperms:api:5.3'
-    compileOnly 'com.github.NEZNAMY:TAB:2.9.0'
-    compileOnly 'com.discordsrv:discordsrv:1.23.0'
+    compileOnly 'io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT'
+    compileOnly 'net.luckperms:api:5.4'
+    compileOnly 'me.neznamy:tab-api:3.2.1'
+    compileOnly 'com.discordsrv:discordsrv:1.26.0'
+    compileOnly 'me.clip:placeholderapi:2.11.1'
+    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
 
-    implementation 'co.aikar:acf-paper:0.5.0-SNAPSHOT'
+    implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
+}
+
+compileJava {
+    options.compilerArgs += ["-parameters"]
+    options.fork = true
 }
 
 shadowJar {

@@ -16,23 +16,37 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CommandListener implements Listener
 {
-	static List<String> commandBlacklist;
+	static List<String> commandBlacklist, commandWhitelist;
 
 	@EventHandler
 	public void onCommand(PlayerCommandPreprocessEvent event)
 	{
+		boolean isWhitelisted = false;
 		String command = event.getMessage();
 
-		for(String bCommand : commandBlacklist)
+		for(String wCommand : commandWhitelist)
 		{
-			if(command.startsWith('/' + bCommand))
+			if(command.startsWith('/' + wCommand))
 			{
-				return;
+				isWhitelisted = true;
+				break;
+			}
+		}
+
+		if(!isWhitelisted)
+		{
+			for(String bCommand : commandBlacklist)
+			{
+				if(command.startsWith('/' + bCommand))
+				{
+					return;
+				}
 			}
 		}
 
@@ -92,7 +106,21 @@ public class CommandListener implements Listener
 
 	public static void loadBlacklist()
 	{
-		commandBlacklist = Mesa.getPlugin().getConfig().getStringList("commandspy-blacklist");
+		commandBlacklist = new ArrayList<>();
+		commandWhitelist = new ArrayList<>();
+
+		List<String> commandList = Mesa.getPlugin().getConfig().getStringList("commandspy-blacklist");
+		for(String command : commandList)
+		{
+			if(command.startsWith("!"))
+			{
+				commandWhitelist.add(command.replaceFirst("!", ""));
+			}
+			else
+			{
+				commandBlacklist.add(command);
+			}
+		}
 	}
 
 	private Message generateMessage(Player player, String command)
@@ -103,6 +131,7 @@ public class CommandListener implements Listener
 				.append("X: ").append(location.getBlockX())
 				.append(", Y: ").append(location.getBlockY())
 				.append(", Z: ").append(location.getBlockZ())
+				.append(", In World: ").append(location.getWorld().getName())
 				.append("\n`").append(command).append("`").build();
 	}
 

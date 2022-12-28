@@ -1,8 +1,8 @@
 package com.crimsonvalkyrie.mesa.misc;
 
 import com.crimsonvalkyrie.mesa.Mesa;
-import me.neznamy.tab.api.EnumProperty;
-import me.neznamy.tab.api.TABAPI;
+import me.neznamy.tab.api.TabAPI;
+import me.neznamy.tab.api.team.UnlimitedNametagManager;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
@@ -21,8 +21,9 @@ public class TagUtils
 	private static final String PERMISSION_PREFIX = "mesa.tag.";
 	private static final String ADMIN_PERMISSION = "mesa.admin";
 
-	private static HashMap<TagType, LinkedHashMap<String, String>> tagMap;
-	private static HashMap<TagType, LinkedHashSet<String>> variantMap;
+	private static HashMap<TagType, HashMap<String, String>> fullMap;
+	private static HashMap<TagType, LinkedHashMap<String, String>> baseMap;
+	private static HashMap<TagType, HashMap<String, LinkedHashMap<String, String>>> variantMap;
 
 	private static final String TAGS = "tags";
 	private static final String TITLES = "titles";
@@ -33,9 +34,9 @@ public class TagUtils
 	private static final String DOT_DEFAULT = ".default";
 	private static final String DOT_VARIANTS = ".variants";
 
-	public static List<String> getPermissibleTagCodesOfType(Player player, TagType type)
+	public static List<String> getPermissibleBaseTagCodesOfType(Player player, TagType type)
 	{
-		LinkedHashMap<String, String> map = tagMap.get(type);
+		LinkedHashMap<String, String> map = baseMap.get(type);
 
 		if(player.hasPermission(ADMIN_PERMISSION))
 		{
@@ -55,7 +56,37 @@ public class TagUtils
 		String finalPermPrefix = permPrefix;
 		map.keySet().forEach(key ->
 		{
-			Mesa.getPlugin().getLogger().info("Checking to see if " + player.getName() + " has permission: " + finalPermPrefix + key);
+			if(player.hasPermission(finalPermPrefix + key))
+			{
+				tagCodeList.add(key);
+			}
+		});
+
+		return tagCodeList;
+	}
+
+	public static List<String> getPermissibleVariantTagCodesOfType(Player player, TagType type, String baseTag)
+	{
+		LinkedHashMap<String, String> map = variantMap.get(type).get(baseTag);
+
+		if(player.hasPermission(ADMIN_PERMISSION))
+		{
+			return new ArrayList<>(map.keySet());
+		}
+
+		String permPrefix = PERMISSION_PREFIX;
+		switch(type)
+		{
+			case TITLE -> permPrefix += TITLES + DOT;
+			case PREFIX -> permPrefix += PREFIXES + DOT;
+			case SUFFIX -> permPrefix += SUFFIXES + DOT;
+		}
+
+		ArrayList<String> tagCodeList = new ArrayList<>();
+
+		String finalPermPrefix = permPrefix;
+		map.keySet().forEach(key ->
+		{
 			if(player.hasPermission(finalPermPrefix + key))
 			{
 				tagCodeList.add(key);
@@ -69,7 +100,13 @@ public class TagUtils
 	{
 		if(type == TagType.TITLE)
 		{
-			return TABAPI.getPlayer(player.getUniqueId()).getOriginalValue(EnumProperty.ABOVENAME);
+			TabAPI tabAPI = TabAPI.getInstance();
+
+			if(tabAPI.getTeamManager() instanceof UnlimitedNametagManager nametagManager)
+			{
+				return nametagManager.getCustomLineValue(tabAPI.getPlayer(player.getUniqueId()), "abovename");
+			}
+			return "";
 		}
 		else
 		{
@@ -88,28 +125,79 @@ public class TagUtils
 
 	public static boolean setTag(Player player, TagType type, String tagCode)
 	{
-		String permPrefix = PERMISSION_PREFIX;
-		switch(type)
-		{
-			case TITLE -> permPrefix += TITLES + DOT;
-			case PREFIX -> permPrefix += PREFIXES + DOT;
-			case SUFFIX -> permPrefix += SUFFIXES + DOT;
-		}
+		TabAPI tabAPI = TabAPI.getInstance();
 
-		if(player.hasPermission(permPrefix + tagCode) || player.hasPermission(ADMIN_PERMISSION))
+			String permPrefix = PERMISSION_PREFIX;
+			switch(type)
+			{
+				case TITLE -> permPrefix += TITLES + DOT;
+				case PREFIX -> permPrefix += PREFIXES + DOT;
+				case SUFFIX -> permPrefix += SUFFIXES + DOT;
+			}
+
+			if(player.hasPermission(permPrefix + tagCode) || player.hasPermission(ADMIN_PERMISSION))
+			{
+				UUID uuid = player.getUniqueId();
+				String tag = fullMap.get(type).get(tagCode);
+				if(tag == null)
+				{
+					Mesa.getPlugin().getLogger().info(player.getName() + " attempted to set an invalid " + type.toString().toLowerCase() + ": " + tagCode);
+					return false;
+				}
+
+				if(type == TagType.TITLE)
+				{
+					if(tabAPI.getTeamManager() instanceof UnlimitedNametagManager nametagManager)
+					{
+						nametagManager.setLine(tabAPI.getPlayer(uuid), "abovename", tag);
+					}
+				}
+				else
+				{
+					UserManager userManager = Mesa.getLuckPerms().getUserManager();
+
+					userManager.modifyUser(uuid, user ->
+					{
+						Node node;
+						//noinspection rawtypes
+						NodeType nodeType;
+
+						//Create the node and set node type
+						if(type == TagType.PREFIX)
+						{
+							node = PrefixNode.builder(tag, PRIORITY).build();
+							nodeType = NodeType.PREFIX;
+						}
+						else
+						{
+							node = SuffixNode.builder(tag, PRIORITY).build();
+							nodeType = NodeType.SUFFIX;
+
+						}
+
+						//Clear previous prefix/suffix
+						user.data().clear(nodeType::matches);
+
+						//Add the node to the user
+						user.data().add(node);
+					});
+				}
+				return true;
+			}
+		return false;
+	}
+
+	public static void clearTag(Player player, TagType type)
+	{
+		TabAPI tabAPI = TabAPI.getInstance();
+
+		if(tabAPI.getTeamManager() instanceof UnlimitedNametagManager nametagManager)
 		{
 			UUID uuid = player.getUniqueId();
-			String tag = tagMap.get(type).get(tagCode);
-			if(tag == null)
-			{
-				Mesa.getPlugin().getLogger().info(player.getName() + " attempted to set an invalid " + type.toString().toLowerCase() + ": " + tagCode);
-				return false;
-			}
 
 			if(type == TagType.TITLE)
 			{
-				Mesa.getPlugin().getLogger().info("Setting title for " + player.getName() + ": " + tagCode);
-				TABAPI.getPlayer(uuid).setValuePermanently(EnumProperty.ABOVENAME, tag);
+				nametagManager.resetLine(tabAPI.getPlayer(uuid), "abovename");
 			}
 			else
 			{
@@ -117,62 +205,20 @@ public class TagUtils
 
 				userManager.modifyUser(uuid, user ->
 				{
-					Node node;
 					//noinspection rawtypes
-					NodeType nodeType;
-
-					//Create the node and set node type
-					if(type == TagType.PREFIX)
-					{
-						node = PrefixNode.builder(tag, PRIORITY).build();
-						nodeType = NodeType.PREFIX;
-					}
-					else
-					{
-						node = SuffixNode.builder(tag, PRIORITY).build();
-						nodeType = NodeType.SUFFIX;
-
-					}
+					NodeType nodeType = type == TagType.PREFIX ? NodeType.PREFIX : NodeType.SUFFIX;
 
 					//Clear previous prefix/suffix
 					user.data().clear(nodeType::matches);
-
-					//Add the node to the user
-					user.data().add(node);
 				});
 			}
-			return true;
-		}
-		return false;
-	}
-
-	public static void clearTag(Player player, TagType type)
-	{
-		UUID uuid = player.getUniqueId();
-
-		if(type == TagType.TITLE)
-		{
-			Mesa.getPlugin().getLogger().info("Clearing title for " + player.getName());
-			TABAPI.getPlayer(uuid).setValuePermanently(EnumProperty.ABOVENAME, "");
-		}
-		else
-		{
-			UserManager userManager = Mesa.getLuckPerms().getUserManager();
-
-			userManager.modifyUser(uuid, user ->
-			{
-				//noinspection rawtypes
-				NodeType nodeType = type == TagType.PREFIX ? NodeType.PREFIX : NodeType.SUFFIX;
-
-				//Clear previous prefix/suffix
-				user.data().clear(nodeType::matches);
-			});
 		}
 	}
 
 	public static void loadTagsFromConfig()
 	{
-		tagMap = new LinkedHashMap<>();
+		fullMap = new HashMap<>();
+		baseMap = new LinkedHashMap<>();
 		variantMap = new LinkedHashMap<>();
 
 		ConfigurationSection tagsSection = Mesa.getPlugin().getConfig().getConfigurationSection(TAGS);
@@ -211,8 +257,9 @@ public class TagUtils
 
 	private static void loadTagsOfType(TagType type, ConfigurationSection configSection)
 	{
-		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-		LinkedHashSet<String> variantSet = new LinkedHashSet<>();
+		HashMap<String, String> fullMap = new HashMap<>();
+		LinkedHashMap<String, String> baseMap = new LinkedHashMap<>();
+		LinkedHashMap<String, LinkedHashMap<String, String>> variantMap = new LinkedHashMap<>();
 
 		Set<String> keys = configSection.getKeys(true);
 		keys.forEach(key ->
@@ -222,13 +269,31 @@ public class TagUtils
 				if(key.endsWith(DOT_DEFAULT))
 				{
 					String tagName = key.substring(0, key.lastIndexOf(DOT_DEFAULT));
-					map.put(tagName, (String) configSection.get(key));
-					variantSet.add(tagName);
+					baseMap.put(tagName, (String) configSection.get(key));
+
+					if(!variantMap.containsKey(tagName))
+					{
+						variantMap.put(tagName, new LinkedHashMap<>());
+					}
+
+					variantMap.get(tagName).put(key, configSection.getString(key));
+				}
+				else if(key.contains(DOT_VARIANTS + DOT))
+				{
+					String tagName = key.substring(0, key.lastIndexOf(DOT_VARIANTS));
+
+					if(!variantMap.containsKey(tagName))
+					{
+						variantMap.put(tagName, new LinkedHashMap<>());
+					}
+
+					variantMap.get(tagName).put(key, configSection.getString(key));
 				}
 				else
 				{
-					map.put(key, (String) configSection.get(key));
+					baseMap.put(key, configSection.getString(key));
 				}
+				fullMap.put(key, configSection.getString(key));
 			}
 			else
 			{
@@ -239,16 +304,17 @@ public class TagUtils
 			}
 		});
 
-		tagMap.put(type, map);
-		variantMap.put(type, variantSet);
+		TagUtils.fullMap.put(type, fullMap);
+		TagUtils.baseMap.put(type, baseMap);
+		TagUtils.variantMap.put(type, variantMap);
 	}
 
-	public static LinkedHashMap<String, String> getTagMap(TagType type)
+	public static LinkedHashMap<String, String> getBaseMap(TagType type)
 	{
-		return tagMap.get(type);
+		return baseMap.get(type);
 	}
 
-	public static LinkedHashSet<String> getVariantSet(TagType type)
+	public static HashMap<String, LinkedHashMap<String, String>> getVariantMap(TagType type)
 	{
 		return variantMap.get(type);
 	}
