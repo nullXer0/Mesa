@@ -6,18 +6,23 @@ import com.crimsonvalkyrie.mesa.commands.MesaCommand;
 import com.crimsonvalkyrie.mesa.commands.SpyCommand;
 import com.crimsonvalkyrie.mesa.commands.TagCommand;
 import com.crimsonvalkyrie.mesa.listeners.CommandListener;
+import com.crimsonvalkyrie.mesa.listeners.JoinListener;
 import com.crimsonvalkyrie.mesa.listeners.TrackerListener;
+import com.crimsonvalkyrie.mesa.misc.Database;
 import com.crimsonvalkyrie.mesa.misc.SpyStorage;
 import com.crimsonvalkyrie.mesa.misc.TagUtils;
 import com.crimsonvalkyrie.mesa.misc.TrackerUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.sql.SQLException;
 
 public final class Mesa extends JavaPlugin
 {
@@ -26,6 +31,8 @@ public final class Mesa extends JavaPlugin
 	private static PaperCommandManager commandManager;
 	private static Economy economy;
 
+	private static Database database;
+
 	@Override
 	public void onEnable()
 	{
@@ -33,6 +40,17 @@ public final class Mesa extends JavaPlugin
 		reloadConfig();
 
 		plugin = this;
+
+		try
+		{
+			database = new Database(this);
+		}
+		catch(SQLException exception)
+		{
+			exception.printStackTrace();
+			Bukkit.getPluginManager().disablePlugin(this);
+		}
+
 		luckPerms = LuckPermsProvider.get();
 		commandManager = new PaperCommandManager(this);
 		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
@@ -85,6 +103,7 @@ public final class Mesa extends JavaPlugin
 
 		pluginManager.registerEvents(new CommandListener(), plugin);
 		pluginManager.registerEvents(new TrackerListener(), plugin);
+		pluginManager.registerEvents(new JoinListener(), plugin);
 	}
 
 	public static Plugin getPlugin()
@@ -100,5 +119,10 @@ public final class Mesa extends JavaPlugin
 	public static Economy getEconomy()
 	{
 		return economy;
+	}
+
+	public static Database getDatabase()
+	{
+		return database;
 	}
 }
