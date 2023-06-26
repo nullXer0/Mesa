@@ -67,6 +67,8 @@ public class ChatUIUtils
 
 		if(page > 1)
 		{
+			//Do not change this to unicode, it will break
+			//noinspection UnnecessaryUnicodeEscape
 			pageBuilder.append(Component.text("\u25C0").clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type.toString().toLowerCase() + " list " + (page - 1))), Component.space());
 		}
 
@@ -74,6 +76,8 @@ public class ChatUIUtils
 
 		if(page < totalPages)
 		{
+			//Do not change this to unicode, it will break
+			//noinspection UnnecessaryUnicodeEscape
 			pageBuilder.append(Component.space(), Component.text("\u25B6").clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/" + type.toString().toLowerCase() + " list " + (page + 1))));
 		}
 

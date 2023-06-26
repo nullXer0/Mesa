@@ -8,7 +8,6 @@ import github.scarsz.discordsrv.dependencies.jda.api.MessageBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,6 +22,8 @@ import java.util.UUID;
 public class CommandListener implements Listener
 {
 	static List<String> commandBlacklist, commandWhitelist;
+
+	private static final String PREFIX_MINIMESSAGE = "<gold>[<dark_green>!<gold>] <reset>";
 
 	@EventHandler
 	public void onCommand(PlayerCommandPreprocessEvent event)
@@ -57,8 +58,7 @@ public class CommandListener implements Listener
 				Player player = Bukkit.getPlayer(UUID.fromString(spy));
 				if(player != null && player.isOnline())
 				{
-					player.sendMessage(ChatColor.GOLD + "[" + ChatColor.DARK_GREEN + "!" + ChatColor.GOLD + "] " + ChatColor.RESET
-							+ event.getPlayer().getName() + " executed: " + command);
+					player.sendRichMessage(PREFIX_MINIMESSAGE + event.getPlayer().getName() + " executed: " + command);
 				}
 			}
 		}

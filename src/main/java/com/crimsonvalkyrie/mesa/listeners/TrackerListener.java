@@ -31,6 +31,7 @@ public class TrackerListener implements Listener
 			if(stack.getType() == Material.ENDER_EYE && stack.lore() != null)
 			{
 				List<Component> lore = stack.lore();
+				//noinspection DataFlowIssue
 				if(lore.size() == 2)
 				{
 					if(lore.get(0).equals(TRACKER_EYE_LORE))

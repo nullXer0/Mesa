@@ -21,9 +21,7 @@ public class Database
 		ConfigurationSection dbSection = plugin.getConfig().getConfigurationSection("database");
 
 		dbDataSource = new MariaDbDataSource();
-		dbDataSource.setServerName(dbSection.getString("host"));
-		dbDataSource.setPortNumber(dbSection.getInt("port"));
-		dbDataSource.setDatabaseName(dbSection.getString("database"));
+		dbDataSource.setUrl("jdbc:mariadb://" + dbSection.getString("host") + "/" + dbSection.getString("database"));
 		dbDataSource.setUser(dbSection.getString("user"));
 		dbDataSource.setPassword(dbSection.getString("password"));
 

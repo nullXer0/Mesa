@@ -1,9 +1,8 @@
 database:
-  host:
-  port:
-  database:
-  user:
-  password:
+  host: ""
+  database: ""
+  user: ""
+  password: ""
 discord:
   token: ""
   channel: ""

@@ -67,11 +67,11 @@ public class TagCommand extends BaseCommand
 
 		if(TagUtils.setTag(player, type, tagCode))
 		{
-			player.sendMessage("Your " + getExecCommandLabel() + " has been updated");
+			player.sendMessage(Component.text("Your " + getExecCommandLabel() + " has been updated"));
 		}
 		else
 		{
-			player.sendMessage("Unknown title");
+			player.sendMessage(Component.text("Unknown title"));
 		}
 	}
 

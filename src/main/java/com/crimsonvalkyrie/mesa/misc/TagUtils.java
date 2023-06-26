@@ -2,7 +2,7 @@ package com.crimsonvalkyrie.mesa.misc;
 
 import com.crimsonvalkyrie.mesa.Mesa;
 import me.neznamy.tab.api.TabAPI;
-import me.neznamy.tab.api.team.UnlimitedNametagManager;
+import me.neznamy.tab.api.nametag.UnlimitedNameTagManager;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
@@ -102,7 +102,7 @@ public class TagUtils
 		{
 			TabAPI tabAPI = TabAPI.getInstance();
 
-			if(tabAPI.getTeamManager() instanceof UnlimitedNametagManager nametagManager)
+			if(tabAPI.getNameTagManager() instanceof UnlimitedNameTagManager nametagManager)
 			{
 				return nametagManager.getCustomLineValue(tabAPI.getPlayer(player.getUniqueId()), "abovename");
 			}
@@ -110,7 +110,7 @@ public class TagUtils
 		}
 		else
 		{
-			@SuppressWarnings("ConstantConditions")
+			@SuppressWarnings("DataFlowIssue")
 			CachedMetaData metaData = Mesa.getLuckPerms().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData();
 			if(type == TagType.PREFIX)
 			{
@@ -127,63 +127,63 @@ public class TagUtils
 	{
 		TabAPI tabAPI = TabAPI.getInstance();
 
-			String permPrefix = PERMISSION_PREFIX;
-			switch(type)
+		String permPrefix = PERMISSION_PREFIX;
+		switch(type)
+		{
+			case TITLE -> permPrefix += TITLES + DOT;
+			case PREFIX -> permPrefix += PREFIXES + DOT;
+			case SUFFIX -> permPrefix += SUFFIXES + DOT;
+		}
+
+		if(player.hasPermission(permPrefix + tagCode) || player.hasPermission(ADMIN_PERMISSION))
+		{
+			UUID uuid = player.getUniqueId();
+			String tag = fullMap.get(type).get(tagCode);
+			if(tag == null)
 			{
-				case TITLE -> permPrefix += TITLES + DOT;
-				case PREFIX -> permPrefix += PREFIXES + DOT;
-				case SUFFIX -> permPrefix += SUFFIXES + DOT;
+				Mesa.getPlugin().getLogger().info(player.getName() + " attempted to set an invalid " + type.toString().toLowerCase() + ": " + tagCode);
+				return false;
 			}
 
-			if(player.hasPermission(permPrefix + tagCode) || player.hasPermission(ADMIN_PERMISSION))
+			if(type == TagType.TITLE)
 			{
-				UUID uuid = player.getUniqueId();
-				String tag = fullMap.get(type).get(tagCode);
-				if(tag == null)
+				if(tabAPI.getNameTagManager() instanceof UnlimitedNameTagManager nametagManager)
 				{
-					Mesa.getPlugin().getLogger().info(player.getName() + " attempted to set an invalid " + type.toString().toLowerCase() + ": " + tagCode);
-					return false;
+					nametagManager.setLine(tabAPI.getPlayer(uuid), "abovename", tag);
 				}
+			}
+			else
+			{
+				UserManager userManager = Mesa.getLuckPerms().getUserManager();
 
-				if(type == TagType.TITLE)
+				userManager.modifyUser(uuid, user ->
 				{
-					if(tabAPI.getTeamManager() instanceof UnlimitedNametagManager nametagManager)
+					Node node;
+					//noinspection rawtypes
+					NodeType nodeType;
+
+					//Create the node and set node type
+					if(type == TagType.PREFIX)
 					{
-						nametagManager.setLine(tabAPI.getPlayer(uuid), "abovename", tag);
+						node = PrefixNode.builder(tag, PRIORITY).build();
+						nodeType = NodeType.PREFIX;
 					}
-				}
-				else
-				{
-					UserManager userManager = Mesa.getLuckPerms().getUserManager();
-
-					userManager.modifyUser(uuid, user ->
+					else
 					{
-						Node node;
-						//noinspection rawtypes
-						NodeType nodeType;
+						node = SuffixNode.builder(tag, PRIORITY).build();
+						nodeType = NodeType.SUFFIX;
 
-						//Create the node and set node type
-						if(type == TagType.PREFIX)
-						{
-							node = PrefixNode.builder(tag, PRIORITY).build();
-							nodeType = NodeType.PREFIX;
-						}
-						else
-						{
-							node = SuffixNode.builder(tag, PRIORITY).build();
-							nodeType = NodeType.SUFFIX;
+					}
 
-						}
+					//Clear previous prefix/suffix
+					user.data().clear(nodeType::matches);
 
-						//Clear previous prefix/suffix
-						user.data().clear(nodeType::matches);
-
-						//Add the node to the user
-						user.data().add(node);
-					});
-				}
-				return true;
+					//Add the node to the user
+					user.data().add(node);
+				});
 			}
+			return true;
+		}
 		return false;
 	}
 
@@ -191,13 +191,13 @@ public class TagUtils
 	{
 		TabAPI tabAPI = TabAPI.getInstance();
 
-		if(tabAPI.getTeamManager() instanceof UnlimitedNametagManager nametagManager)
+		if(tabAPI.getNameTagManager() instanceof UnlimitedNameTagManager nametagManager)
 		{
 			UUID uuid = player.getUniqueId();
 
 			if(type == TagType.TITLE)
 			{
-				nametagManager.resetLine(tabAPI.getPlayer(uuid), "abovename");
+				nametagManager.setLine(tabAPI.getPlayer(uuid), "abovename", null);
 			}
 			else
 			{
@@ -223,7 +223,7 @@ public class TagUtils
 
 		ConfigurationSection tagsSection = Mesa.getPlugin().getConfig().getConfigurationSection(TAGS);
 
-		@SuppressWarnings("ConstantConditions")
+		@SuppressWarnings("DataFlowIssue")
 		ConfigurationSection titleSection = tagsSection.getConfigurationSection(TITLES);
 		if(titleSection != null)
 		{

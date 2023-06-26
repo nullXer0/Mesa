@@ -4,8 +4,8 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.crimsonvalkyrie.mesa.Mesa;
 import com.crimsonvalkyrie.mesa.misc.TrackerUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -19,7 +19,7 @@ public class MesaCommand extends BaseCommand
 	public void onReload()
 	{
 		Mesa.reload();
-		getCurrentCommandIssuer().sendMessage(ChatColor.GREEN + "Plugin reloaded");
+		getCurrentCommandIssuer().sendMessage(NamedTextColor.GREEN + "Plugin reloaded");
 	}
 
 	@Subcommand("giveTracker")

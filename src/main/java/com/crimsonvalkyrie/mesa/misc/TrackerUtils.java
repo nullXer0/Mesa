@@ -37,14 +37,14 @@ public class TrackerUtils
 	{
 		ItemStack stack = TRACKER_EYE.clone();
 		List<Component> lore = stack.lore();
-		//noinspection ConstantConditions
+		//noinspection DataFlowIssue
 		lore.add(Component.text("Tracking: " + playerToTrack));
 		stack.lore(lore);
 		stack.setAmount(amount);
 		HashMap<Integer, ItemStack> remainingItems = playerToGive.getInventory().addItem(stack);
 		if(!remainingItems.isEmpty())
 		{
-			remainingItems.values().forEach(remainingItem -> playerToGive.getWorld().dropItem(playerToGive.getLocation().add(0,1,0), remainingItem));
+			remainingItems.values().forEach(remainingItem -> playerToGive.getWorld().dropItem(playerToGive.getLocation().add(0, 1, 0), remainingItem));
 		}
 	}
 
